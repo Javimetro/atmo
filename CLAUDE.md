@@ -93,12 +93,12 @@ Sensible first commit once there's something worth committing: this
 
 ## What we're building first (Milestone 1 scope)
 
-Wio Terminal + Battery Chassis + Grove I2C Hub. No wireless networking, no
-Raspberry Pi — plenty of headroom to run I2C sensor reads + Bosch's BSEC
-library + the face renderer entirely on the Wio Terminal alone.
+Wio Terminal + Battery Chassis. No wireless networking, no Raspberry Pi —
+plenty of headroom to run I2C sensor reads + Bosch's BSEC library + the
+face renderer entirely on the Wio Terminal alone.
 
-**Sensors**: BME688 (Grove single-sensor board) + SGP30, both through the
-Grove I2C Hub into one Wio Terminal Grove port.
+**Sensors**: BME688 (Grove single-sensor board) + SGP30, wired directly —
+no Grove I2C Hub needed (revised 2026-09-13, see wiring fact below).
 - SGP30 (VOC + eCO2) — I2C address `0x58`.
 - BME688 (temp/humidity/pressure/gas, with BSEC AI gas classification) —
   I2C address `0x76` or `0x77` depending on hardware SDO pull.
@@ -108,13 +108,20 @@ Grove I2C Hub into one Wio Terminal Grove port.
   shares BME688's address family, so don't try to run both on the bus at
   once without confirming a hardware address change is possible.
 
-**Important wiring fact** (confirmed from the Wio Terminal's own schematic):
-the two onboard Grove ports are **not** separate I2C buses — both tie to
-the same `I2C1_SCL`/`I2C1_SDA` net. The Grove I2C Hub is a passive splitter
-of that same bus, not a multiplexer. So plugging sensors into different
-Grove ports does *not* avoid I2C address collisions; a real bus split would
-need an active mux chip (e.g. TCA9548A), which this build doesn't use or
-need since BME688 and SGP30 don't collide.
+**Important wiring fact** (confirmed from the Wio Terminal's own schematic
+and the Battery Chassis datasheet): the Wio Terminal's two onboard Grove
+ports are **not** separate I2C buses — both tie to the same
+`I2C1_SCL`/`I2C1_SDA` net. The Battery Chassis's single Grove I2C port
+(one of its 6 Grove ports — the other 5 are 4× Analog/Digital + 1× UART,
+not I2C) is wired to that *same* `I2C1_SCL`/`I2C1_SDA` net too, not a
+separate bus. So across the Wio Terminal + chassis there are three sockets
+electrically tied to one I2C bus, no active mux — a **Grove I2C Hub is
+just a passive splitter of that same bus** and isn't needed to wire two
+non-colliding sensors: BME688 goes straight into a Wio Terminal Grove
+port, SGP30 goes straight into the chassis's Grove I2C port. Own a Grove
+I2C Hub as spare capacity for a future third I2C device; a real bus split
+would need an active mux chip (e.g. TCA9548A), which this build doesn't
+use or need since BME688 and SGP30 don't collide.
 
 **Software stack**: Arduino framework for Wio Terminal (Seeed board
 package); Bosch BSEC library for BME688 → calibrated IAQ index (0–500);
@@ -141,7 +148,8 @@ working, without touching the mood-detection logic.
 
 ### Milestones
 
-1. **Bring-up**: wire BME688 + SGP30 through the I2C Hub, print raw
+1. **Bring-up**: wire BME688 into a Wio Terminal Grove port and SGP30 into
+   the Battery Chassis's Grove I2C port (no hub needed), print raw
    readings over serial.
 2. Compute a single air-quality score/category from BSEC IAQ + SGP30
    TVOC/eCO2.
