@@ -14,10 +14,18 @@ animated face on the Wio Terminal's screen, instead of a numeric dashboard.
 Ambient, affective UX rather than a data readout.
 
 Explicitly an *environmental air-quality* project, not a breath-analysis
-one. Avoid "nose"/"sniff" framing in naming, comments, or animation ideas
-unless Javi deliberately says otherwise.
+one — that boundary still holds even though the point below revises the
+nose/sniff-imagery avoidance that used to sit alongside it.
 
 Name: **Atmo** — both the project and the on-screen character.
+
+**Character form: Atmo is a dog** (decided 2026-09-13, deliberately — dogs
+have a strong sense of smell, which is exactly the metaphor for air-quality
+sensing). Sniffing is a **core idle/reactive animation tic**, not just
+decoration: Atmo visibly sniffs the air, and sniff rate/intensity scales
+with how bad the current air-quality reading is — calm, slow sniffs when
+air is good, faster/more urgent sniffing as it degrades. This sits on top
+of the mood/expression system below, it doesn't replace it.
 
 ## How Javi wants this built — read this before writing any code
 
@@ -114,9 +122,14 @@ SGP30 library for TVOC/eCO2 (needs its own baseline calibration, ~12h to
 fully settle — runs fine uncalibrated in the meantime, worth telling Javi
 this explicitly when that code goes in).
 
-**Face rendering**: draw the face as vector shapes (ellipse eyes, arc
-eyebrows, arc/bezier mouth) redrawn each frame, rather than sprite art —
-easiest way to animate and to tween between expressions on this display.
+**Face rendering**: draw the face as vector shapes redrawn each frame,
+rather than sprite art — easiest way to animate and to tween between
+expressions on this display. Dog form needs, beyond the base eyes/eyebrows/
+mouth: two ears (position/angle is a big expressive lever — perked, back,
+relaxed), a snout/nose (the sniff animation lives here — twitch/flare, plus
+subtle in-out motion for breathing), and a tail (wag speed/position as a
+secondary mood indicator, off-screen or a simple indicator element if the
+display is too tight to show a full dog body).
 
 **Animation architecture** — keep two concerns separate from the start, so
 adding idle animation later is additive, not a rewrite:
@@ -132,28 +145,38 @@ working, without touching the mood-detection logic.
    readings over serial.
 2. Compute a single air-quality score/category from BSEC IAQ + SGP30
    TVOC/eCO2.
-3. Build the face engine: static pose per mood first.
+3. Build the face engine: static dog pose per mood first (ears, snout,
+   eyes, mouth).
 4. Map air-quality categories to expressions, with smooth (tweened, not
    hard-cut) transitions between moods. Draft expression set — still open
    to refinement with Javi:
-   - **Content** (good air) — relaxed curved-up eyes, soft mouth, slow idle
-     blink.
-   - **Curious/alert** (moderate) — eyebrows raise slightly, eyes widen a
-     touch.
-   - **Concerned** (poor) — furrowed brow, mouth flattens/turns down,
+   - **Content** (good air) — relaxed curved-up eyes, soft open mouth
+     (panting-happy), ears relaxed/perked casually, tail wagging gently,
+     slow calm sniffs.
+   - **Curious/alert** (moderate) — head tilt, ears perk up fully, eyes
+     widen a touch, more active/investigating sniffs.
+   - **Concerned** (poor) — furrowed brow, ears pull back/flatten
+     slightly, mouth flattens/turns down, faster more anxious sniffing,
      faster blink.
-   - **Distressed** (hazardous) — eyes squint, mouth animates like a
-     cough/sneeze, maybe a shake animation.
-5. Polish: buzzer chirp/alert cues, dim the face at night using the onboard
+   - **Distressed** (hazardous) — eyes squint, ears fully back, tail
+     down/tucked, rapid frantic sniffing or a recoil-from-smell flinch,
+     mouth animates like a cough/sneeze, maybe a shake animation.
+5. Polish: buzzer chirp/alert cues (could double as a bark/whimper-style
+   audio cue given the dog form), dim the face at night using the onboard
    light sensor.
 
-Idle micro-animations to layer on per mood once the static version works:
-- Content — slow idle blink, gentle bob/sway like breathing, occasional
-  happy glance side to side, maybe a bounce loop or stretch/yawn.
-- Curious/alert — head-tilt, eyes darting as if "checking something," one
-  eyebrow twitching up randomly.
-- Concerned — brow twitch/pulse, small wince tic, creeping blink rate.
-- Distressed — repeated cough loop, shake/vibrate effect, maybe a "watery
+Idle micro-animations to layer on per mood once the static version works —
+sniffing rate/intensity is the throughline across all four, plus
+mood-specific extras:
+- Content — slow calm sniffs, gentle bob/sway like breathing, occasional
+  happy glance side to side, relaxed tail wag, maybe a bounce loop or
+  stretch/yawn.
+- Curious/alert — head-tilt, more active/searching sniffs, eyes darting as
+  if "checking something," one ear twitching up randomly.
+- Concerned — faster more anxious sniffing, brow twitch/pulse, small wince
+  tic, ears creeping back, creeping blink rate.
+- Distressed — rapid frantic sniffing (maybe a recoil-from-smell flinch),
+  repeated cough loop, shake/vibrate effect, tail tucked, maybe a "watery
   eye" flourish.
 
 Remember: per the working-style section above, break each milestone itself
@@ -163,6 +186,10 @@ implementing it — don't build a whole milestone in one shot either.
 ## Confirmed scope decisions (don't relitigate without asking Javi)
 
 - Name: **Atmo** (project + character), locked 2026-09-12.
+- Character form: **dog**, locked 2026-09-13 — sniffing is a core
+  idle/reactive animation tic tied to air-quality severity, not just
+  decoration. Deliberate revision of the earlier nose/sniff-imagery
+  avoidance; the environmental-vs-breath-analysis boundary is unaffected.
 - First build's sensors: BME688 + SGP30 via the Grove I2C Hub. No TGS1820,
   no H2S/MQ modules, no 8x BME688 AI-Studio dev kit, no BME680 — those live
   under "Ideas for later" below instead.
@@ -190,10 +217,6 @@ implementing it — don't build a whole milestone in one shot either.
      like ntfy.sh/Pushover/a Telegram bot webhook — no backend needed.
   2. Passive remote viewing: seeing Atmo's current face/mood live from a
      phone — needs a small backend + simple app/web page, bigger scope.
-- **Sniffing nose / animal character** idle animation — touches the
-  nose/sniff naming boundary above. Don't add without Javi explicitly
-  deciding to revise that boundary; a bounce/ear-twitch/blink-and-tilt tic
-  keeps the boundary intact as an alternative.
 - **AI integration (Claude/MCP)**: give Atmo actual reasoning/conversation
   (e.g. comparing indoor readings against fetched outside weather and
   saying something proactive) rather than only reacting with a face.
