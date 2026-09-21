@@ -73,10 +73,10 @@ the number climb).
   — an all-in-one microcontroller with a built-in 320×240 screen, a
   5-way joystick, and Grove connectors. Runs the entire project by
   itself, no separate computer needed.
-- **[Wio Terminal Battery Chassis](https://www.seeedstudio.com/Wio-Terminal-Chassis-Air-Quality-Kit-p-5228.html)**
+- **[Wio Terminal Battery Chassis](https://www.seeedstudio.com/Wio-Terminal-Chassis-Battery-650mAh-p-4756.html)**
   — snaps onto the back, adds a battery and more Grove ports, so Atmo
   can sit anywhere on a desk without a cable.
-- **[BME688](https://www.seeedstudio.com/Grove-Gas-Sensor-BME688-p-4816.html)**
+- **[BME688](https://www.seeedstudio.com/Grove-Gas-Sensor-BME688-p-5478.html)**
   gas/environmental sensor — the thing actually reading the air
   (temperature, humidity, and the gas signal IAQ is calculated from).
   Connects over a single Grove cable, no soldering.
