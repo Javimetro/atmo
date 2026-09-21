@@ -1,6 +1,6 @@
 # Atmo 🦛
 
-By **Javi Jorganes** — vibe-coded with [Claude Code](https://claude.com/claude-code).
+By **Javi Jorganes** — built with [Claude Code](https://claude.com/claude-code).
 
 A desk air-quality companion that doesn't show you a number — it shows
 you a face.
@@ -98,8 +98,8 @@ the hardware.
 
 ## How this was actually built
 
-This project was **vibe-coded** — built through conversation with
-[Claude Code](https://claude.com/claude-code), an AI coding assistant,
+This project was **built through conversation with
+[Claude Code](https://claude.com/claude-code)**, an AI coding assistant,
 rather than hand-writing every line myself.
 
 The split of work was roughly:
